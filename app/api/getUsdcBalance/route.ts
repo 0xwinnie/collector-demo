@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Connection, PublicKey } from '@solana/web3.js';
 
-const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"; // Mainnet USDC
-const RPC_URL = "https://api.mainnet-beta.solana.com";
+const USDC_MINT = process.env.NEXT_PUBLIC_USDC_MINT_ADDRESS!;
+const RPC_URL = process.env.SOLANA_RPC || "https://api.devnet.solana.com";
 
 export async function POST(request: NextRequest) {
     try {
