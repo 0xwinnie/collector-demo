@@ -19,13 +19,10 @@ export default function Home() {
     <div className="container mx-auto px-4 py-8">
       {/* GitHub Link */}
       <div className="text-center mb-4">
-        <a
-          href="https://github.com/daxherrera/gacha-starter"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline text-sm"
-        >
-          View Starter Code on GitHub
+        <a href="https://github.com/daxherrera/gacha-starter" target="_blank">
+          <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+            Go to GitHub Repo
+          </button>
         </a>
       </div>
 
