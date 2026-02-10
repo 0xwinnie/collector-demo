@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { createSolanaRpc, createSolanaRpcSubscriptions } from '@solana/kit';
 import { toSolanaWalletConnectors } from '@privy-io/react-auth/solana';
@@ -9,7 +9,10 @@ const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID || '';
 const clientId = process.env.NEXT_PUBLIC_PRIVY_CLIENT_ID;
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-    if (!appId) {
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
+
+    if (!mounted || !appId) {
         return <>{children}</>;
     }
 
