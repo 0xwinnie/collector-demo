@@ -39,15 +39,28 @@ type PackResult = {
     rarity: string;
 };
 
+type OpeningPhase = "idle" | "generating" | "signing" | "submitting" | "revealing" | "done";
+
+const PHASE_MESSAGES: Record<OpeningPhase, string> = {
+    idle: "",
+    generating: "Generating your pack...",
+    signing: "Please sign the transaction...",
+    submitting: "Submitting to blockchain...",
+    revealing: "Revealing your NFT...",
+    done: "",
+};
+
 export default function PackOpener({ onPackOpened }: PackOpenerProps) {
     const { ready, authenticated } = usePrivy();
     const { wallets } = useWallets();
     const wallet = wallets?.[0];
 
     const [isOpening, setIsOpening] = React.useState(false);
+    const [openingPhase, setOpeningPhase] = React.useState<OpeningPhase>("idle");
     const [error, setError] = React.useState<string | null>(null);
     const [packResult, setPackResult] = React.useState<PackResult | null>(null);
     const [buybackSuccess, setBuybackSuccess] = React.useState<string | null>(null);
+    const [showRevealAnimation, setShowRevealAnimation] = React.useState(false);
 
     const openPack = async () => {
         if (!ready || !wallet) {
@@ -57,6 +70,7 @@ export default function PackOpener({ onPackOpened }: PackOpenerProps) {
 
         setIsOpening(true);
         setError(null);
+        setOpeningPhase("generating");
 
         try {
             // Step 1: Generate pack
@@ -78,6 +92,7 @@ export default function PackOpener({ onPackOpened }: PackOpenerProps) {
             console.log("Memo received:", memo);
 
             // Step 2: Sign the buy transaction
+            setOpeningPhase("signing");
             let signedBuyTx;
             try {
                 // Convert base64 to Uint8Array for Solana wallet
@@ -95,6 +110,7 @@ export default function PackOpener({ onPackOpened }: PackOpenerProps) {
             }
 
             // Step 3: Submit the buy transaction
+            setOpeningPhase("submitting");
             const submitBuyRes = await fetch("/api/submitTransaction", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -108,6 +124,7 @@ export default function PackOpener({ onPackOpened }: PackOpenerProps) {
             }
 
             // Step 4: Open pack
+            setOpeningPhase("revealing");
             const openRes = await fetch("/api/openPack", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -123,8 +140,14 @@ export default function PackOpener({ onPackOpened }: PackOpenerProps) {
             const openResult = await openRes.json();
             console.log("Pack opened successfully:", openResult);
 
+            // Show reveal animation
+            setShowRevealAnimation(true);
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            setShowRevealAnimation(false);
+
             // Set the pack result to show the modal
             setPackResult(openResult);
+            setOpeningPhase("done");
 
             // Success! Refresh NFTs
             onPackOpened?.();
@@ -134,6 +157,7 @@ export default function PackOpener({ onPackOpened }: PackOpenerProps) {
             setError(e instanceof Error ? e.message : "Failed to open pack");
         } finally {
             setIsOpening(false);
+            setOpeningPhase("idle");
         }
     };
 
@@ -170,16 +194,29 @@ export default function PackOpener({ onPackOpened }: PackOpenerProps) {
             {/* Pack Opener Section - Only show if authenticated and has wallet */}
             {ready && authenticated && wallet ? (
                 <div className="mb-6">
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-center gap-4">
                         <button
                             onClick={openPack}
                             disabled={isOpening}
-                            className={`px-6 py-3 rounded-lg font-semibold text-white transition-colors ${isOpening
-                                ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-green-600 hover:bg-green-700"
+                            className={`relative px-8 py-4 rounded-xl font-bold text-lg text-white transition-all duration-300 transform ${isOpening
+                                ? "bg-gradient-to-r from-purple-500 to-pink-500 cursor-not-allowed scale-95"
+                                : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 hover:scale-105 hover:shadow-xl"
                                 }`}
                         >
-                            {isOpening ? "Opening Pack..." : "Open $50 Pack"}
+                            {isOpening ? (
+                                <span className="flex items-center gap-2">
+                                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                    </svg>
+                                    {PHASE_MESSAGES[openingPhase]}
+                                </span>
+                            ) : (
+                                <span className="flex items-center gap-2">
+                                    <span className="text-2xl">🎁</span>
+                                    Open $50 Pack
+                                </span>
+                            )}
                         </button>
 
                         {/* Buyback Success Message */}
@@ -194,12 +231,37 @@ export default function PackOpener({ onPackOpened }: PackOpenerProps) {
                     </div>
 
                     {error && (
-                        <div className="mt-2 text-sm text-red-600">
+                        <div className="mt-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2">
                             Error: {error}
                         </div>
                     )}
                 </div>
             ) : null}
+
+            {/* Reveal Animation Overlay */}
+            {showRevealAnimation && (
+                <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+                    <div className="relative">
+                        {/* Glowing pack animation */}
+                        <div className="w-48 h-64 relative animate-pulse">
+                            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 rounded-2xl animate-spin-slow opacity-50 blur-xl" />
+                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 rounded-2xl flex items-center justify-center">
+                                <div className="text-6xl animate-bounce">✨</div>
+                            </div>
+                        </div>
+                        <div className="absolute -inset-4 flex items-center justify-center">
+                            <div className="text-white text-2xl font-bold animate-pulse">
+                                Revealing...
+                            </div>
+                        </div>
+                        {/* Sparkles */}
+                        <div className="absolute -top-8 -left-8 text-4xl animate-ping">⭐</div>
+                        <div className="absolute -top-4 -right-8 text-3xl animate-ping delay-100">✨</div>
+                        <div className="absolute -bottom-8 -left-4 text-3xl animate-ping delay-200">💫</div>
+                        <div className="absolute -bottom-4 -right-8 text-4xl animate-ping delay-300">🌟</div>
+                    </div>
+                </div>
+            )}
 
             {/* Pack Result - Will be positioned by parent */}
             {packResult && (

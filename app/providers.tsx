@@ -6,19 +6,17 @@ import { createSolanaRpc, createSolanaRpcSubscriptions } from '@solana/kit';
 import { toSolanaWalletConnectors } from '@privy-io/react-auth/solana';
 
 const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID!;
-const clientId = process.env.NEXT_PUBLIC_PRIVY_CLIENT_ID!;
+const clientId = process.env.NEXT_PUBLIC_PRIVY_CLIENT_ID;
 
-if (!appId || !clientId) {
-    throw new Error(
-        'Missing Privy env vars. Set NEXT_PUBLIC_PRIVY_APP_ID and NEXT_PUBLIC_PRIVY_CLIENT_ID.'
-    );
+if (!appId) {
+    throw new Error('Missing NEXT_PUBLIC_PRIVY_APP_ID env var.');
 }
 
 export default function Providers({ children }: { children: React.ReactNode }) {
     return (
         <PrivyProvider
             appId={appId}
-            clientId={clientId}
+            {...(clientId ? { clientId } : {})}
             config={{
                 // Put wallet first so the Privy modal prioritizes wallet connect
                 loginMethods: ['google', 'wallet', 'email'],
