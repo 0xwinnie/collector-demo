@@ -16,8 +16,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ balance: 0 });
         }
 
-        // Read env var at runtime (not build time)
-        const usdcMint = process.env.NEXT_PUBLIC_USDC_MINT_ADDRESS || DEFAULT_DEVNET_USDC;
+        // Hardcode the custom USDC-Dev mint for testing
+        const usdcMint = "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr";
         console.log("[USDC API] Using RPC:", RPC_URL);
         console.log("[USDC API] Using USDC mint:", usdcMint);
         
