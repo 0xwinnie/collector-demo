@@ -7,6 +7,7 @@
 3. Deploy to vercel!
 4. To get dev USDC go here https://spl-token-faucet.com/?token-name=USDC-Dev
    And use the mint Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr
+   
 
 ## Documentation
 
