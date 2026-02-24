@@ -16,6 +16,7 @@ export default function PrivyConnect() {
         const fetchUsdcBalance = async () => {
             if (!wallet?.address) return;
 
+            console.log("[USDC Debug] Fetching balance for:", wallet.address);
             setLoadingBalance(true);
             setUsdcBalance(null);
             try {
@@ -24,6 +25,7 @@ export default function PrivyConnect() {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ address: wallet.address }),
                 });
+                console.log("[USDC Debug] API response status:", response.status);
 
                 if (response.ok) {
                     const data = await response.json();
@@ -68,8 +70,8 @@ export default function PrivyConnect() {
             <div className="inline-flex items-center gap-4 bg-green-50 border border-green-200 rounded-lg px-4 py-2">
                 <div className="flex items-center gap-2">
                     <span className="text-green-800">Connected:</span>
-                    <span className="font-mono text-sm text-green-700">
-                        {wallet?.address ? `${wallet.address.slice(0, 4)}...${wallet.address.slice(-4)}` : "No wallet"}
+                    <span className="font-mono text-xs text-green-700" title={wallet?.address}>
+                        {wallet?.address ? `${wallet.address.slice(0, 6)}...${wallet.address.slice(-6)}` : "No wallet"}
                     </span>
                 </div>
 

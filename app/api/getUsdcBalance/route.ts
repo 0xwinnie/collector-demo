@@ -10,13 +10,17 @@ const DEFAULT_DEVNET_USDC = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
 export async function POST(request: NextRequest) {
     try {
         const { address } = await request.json();
+        console.log("[USDC API] Request for address:", address);
 
         if (!address) {
+            console.log("[USDC API] No address provided");
             return NextResponse.json({ balance: 0 });
         }
 
         // Use environment variable or default devnet USDC
         const usdcMint = USDC_MINT || DEFAULT_DEVNET_USDC;
+        console.log("[USDC API] Using RPC:", RPC_URL);
+        console.log("[USDC API] Using USDC mint:", usdcMint);
         
         let connection: Connection;
         let walletPublicKey: PublicKey;
@@ -27,7 +31,7 @@ export async function POST(request: NextRequest) {
             walletPublicKey = new PublicKey(address);
             usdcMintPublicKey = new PublicKey(usdcMint);
         } catch (parseError) {
-            console.error("Invalid address or mint:", parseError);
+            console.error("[USDC API] Invalid address or mint:", parseError);
             return NextResponse.json({ balance: 0 });
         }
 
@@ -38,24 +42,26 @@ export async function POST(request: NextRequest) {
                 walletPublicKey,
                 { mint: usdcMintPublicKey }
             );
+            console.log("[USDC API] Found", tokenAccounts.value.length, "token accounts");
         } catch (rpcError) {
-            console.error("RPC error fetching token accounts:", rpcError);
-            // Return 0 balance on RPC error instead of failing
+            console.error("[USDC API] RPC error:", rpcError);
             return NextResponse.json({ balance: 0 });
         }
 
         let balance = 0;
         if (tokenAccounts.value.length > 0) {
-            // Get the balance from the first (usually only) USDC token account
             const usdcAccount = tokenAccounts.value[0];
             const accountInfo = usdcAccount.account.data.parsed.info;
             balance = accountInfo.tokenAmount.uiAmount || 0;
+            console.log("[USDC API] Account found, balance:", balance);
+        } else {
+            console.log("[USDC API] No USDC token account found");
         }
 
+        console.log("[USDC API] Returning balance:", balance);
         return NextResponse.json({ balance });
     } catch (error) {
-        console.error("Unexpected error fetching USDC balance:", error);
-        // Always return balance: 0 on any error for better UX
+        console.error("[USDC API] Unexpected error:", error);
         return NextResponse.json({ balance: 0 });
     }
 }
