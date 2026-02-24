@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  distDir: 'dist',
+  // 移除 output: 'export'，支持 Vercel 服务器端渲染和 API 路由
   images: {
     unoptimized: true,
   },
