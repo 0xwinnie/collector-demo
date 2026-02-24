@@ -9,9 +9,11 @@ export async function POST(request: NextRequest) {
         console.log("Original request body:", body);
 
         // Transform the request body to match the API requirements
+        // Support sns_25 pack type (and other types directly)
+        const packType = body.packType || "sns_25";
         const apiRequestBody = {
             playerAddress: body.wallet || body.playerAddress,
-            packType: body.packType === "standard" ? "pokemon_50" : body.packType || "pokemon_50",
+            packType: packType,
             ...(body.turbo && { turbo: body.turbo })
         };
 
