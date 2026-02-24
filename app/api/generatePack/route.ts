@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const API_BASE_URL = "https://dev-gacha.collectorcrypt.com/api";
-const API_KEY = process.env.API_KEY;
 
 export async function POST(request: NextRequest) {
+    // Read API_KEY at runtime (not build time)
+    const API_KEY = process.env.API_KEY;
     try {
         const body = await request.json();
         console.log("Original request body:", body);
