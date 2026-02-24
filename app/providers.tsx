@@ -9,10 +9,14 @@ const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID || '';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
     const [mounted, setMounted] = useState(false);
-    useEffect(() => { setMounted(true); }, []);
+    
+    useEffect(() => { 
+        setMounted(true); 
+    }, []);
 
-    if (typeof window === 'undefined' || !mounted || !appId) {
-        return <>{children}</>;
+    // Don't render PrivyProvider until client-side mount
+    if (!mounted || !appId) {
+        return <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">{children}</div>;
     }
 
     return (

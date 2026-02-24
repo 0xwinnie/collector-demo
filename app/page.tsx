@@ -1,25 +1,7 @@
 "use client";
 
-import dynamic from "next/dynamic";
-
-const PrivyConnect = dynamic(() => import("@/app/components/PrivyConnect"), {
-  ssr: false,
-  loading: () => (
-    <div className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold">
-      Loading...
-    </div>
-  ),
-});
-
-const WalletContent = dynamic(() => import("@/app/components/WalletContent"), {
-  ssr: false,
-  loading: () => (
-    <div className="text-center text-white py-12">
-      <div className="text-6xl mb-4">🎴</div>
-      <p>Loading...</p>
-    </div>
-  ),
-});
+import PrivyConnect from "@/app/components/PrivyConnect";
+import WalletContent from "@/app/components/WalletContent";
 
 export default function Home() {
   return (
