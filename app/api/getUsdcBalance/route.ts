@@ -4,35 +4,45 @@ import { Connection, PublicKey } from '@solana/web3.js';
 const USDC_MINT = process.env.NEXT_PUBLIC_USDC_MINT_ADDRESS!;
 const RPC_URL = process.env.SOLANA_RPC || "https://api.devnet.solana.com";
 
+// Default devnet USDC mint (can be overridden by env)
+const DEFAULT_DEVNET_USDC = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
+
 export async function POST(request: NextRequest) {
     try {
         const { address } = await request.json();
 
         if (!address) {
-            return NextResponse.json(
-                { error: "Address is required" },
-                { status: 400 }
-            );
+            return NextResponse.json({ balance: 0 });
         }
 
-        const connection = new Connection(RPC_URL);
-        const walletPublicKey = new PublicKey(address);
+        // Use environment variable or default devnet USDC
+        const usdcMint = USDC_MINT || DEFAULT_DEVNET_USDC;
         
+        let connection: Connection;
+        let walletPublicKey: PublicKey;
         let usdcMintPublicKey: PublicKey;
+        
         try {
-            usdcMintPublicKey = new PublicKey(USDC_MINT);
-        } catch {
-            return NextResponse.json(
-                { error: "Invalid USDC mint address configuration" },
-                { status: 500 }
-            );
+            connection = new Connection(RPC_URL);
+            walletPublicKey = new PublicKey(address);
+            usdcMintPublicKey = new PublicKey(usdcMint);
+        } catch (parseError) {
+            console.error("Invalid address or mint:", parseError);
+            return NextResponse.json({ balance: 0 });
         }
 
         // Get token accounts for the wallet
-        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
-            walletPublicKey,
-            { mint: usdcMintPublicKey }
-        );
+        let tokenAccounts;
+        try {
+            tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+                walletPublicKey,
+                { mint: usdcMintPublicKey }
+            );
+        } catch (rpcError) {
+            console.error("RPC error fetching token accounts:", rpcError);
+            // Return 0 balance on RPC error instead of failing
+            return NextResponse.json({ balance: 0 });
+        }
 
         let balance = 0;
         if (tokenAccounts.value.length > 0) {
@@ -44,10 +54,8 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ balance });
     } catch (error) {
-        console.error("Error fetching USDC balance:", error);
-        return NextResponse.json(
-            { error: "Failed to fetch USDC balance" },
-            { status: 500 }
-        );
+        console.error("Unexpected error fetching USDC balance:", error);
+        // Always return balance: 0 on any error for better UX
+        return NextResponse.json({ balance: 0 });
     }
 }

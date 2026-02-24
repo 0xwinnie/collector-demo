@@ -17,6 +17,7 @@ export default function PrivyConnect() {
             if (!wallet?.address) return;
 
             setLoadingBalance(true);
+            setUsdcBalance(null);
             try {
                 const response = await fetch("/api/getUsdcBalance", {
                     method: "POST",
@@ -26,10 +27,15 @@ export default function PrivyConnect() {
 
                 if (response.ok) {
                     const data = await response.json();
-                    setUsdcBalance(data.balance || 0);
+                    setUsdcBalance(data.balance ?? 0);
+                } else {
+                    // API returned error, show 0 balance instead of "Error"
+                    console.error("USDC API error:", response.status, await response.text().catch(() => ""));
+                    setUsdcBalance(0);
                 }
             } catch (error) {
                 console.error("Failed to fetch USDC balance:", error);
+                setUsdcBalance(0);
             } finally {
                 setLoadingBalance(false);
             }
@@ -72,10 +78,12 @@ export default function PrivyConnect() {
                     <span className="text-green-800">USDC:</span>
                     {loadingBalance ? (
                         <span className="text-green-700 text-sm">Loading...</span>
-                    ) : (
+                    ) : usdcBalance !== null ? (
                         <span className="font-semibold text-green-700">
-                            {usdcBalance !== null ? `$${usdcBalance.toFixed(2)}` : "Error"}
+                            ${usdcBalance.toFixed(2)}
                         </span>
+                    ) : (
+                        <span className="text-green-700 text-sm">--</span>
                     )}
                     <a
                         href="https://spl-token-faucet.com/?token-name=USDC-Dev"
