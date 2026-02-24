@@ -1,7 +1,15 @@
 "use client";
 
-import PrivyConnect from "@/app/components/PrivyConnect";
 import dynamic from "next/dynamic";
+
+const PrivyConnect = dynamic(() => import("@/app/components/PrivyConnect"), {
+  ssr: false,
+  loading: () => (
+    <div className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold">
+      Loading...
+    </div>
+  ),
+});
 
 const WalletContent = dynamic(() => import("@/app/components/WalletContent"), {
   ssr: false,
