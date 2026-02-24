@@ -13,3 +13,4 @@
 
 Check out the collector crypt gacha API docs at 
 https://docs.collectorcrypt.com/gacha/api
+# AI CTO Deploy Ready
