@@ -1,7 +1,14 @@
 "use client";
 
-import PrivyConnect from "@/app/components/PrivyConnect";
-import WalletContent from "@/app/components/WalletContent";
+import dynamic from "next/dynamic";
+
+const PrivyConnect = dynamic(() => import("@/app/components/PrivyConnect"), {
+  ssr: false,
+});
+
+const WalletContent = dynamic(() => import("@/app/components/WalletContent"), {
+  ssr: false,
+});
 
 export default function Home() {
   return (
