@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Connection, PublicKey } from '@solana/web3.js';
 
-const USDC_MINT = process.env.NEXT_PUBLIC_USDC_MINT_ADDRESS!;
 const RPC_URL = process.env.SOLANA_RPC || "https://api.devnet.solana.com";
 
 // Default devnet USDC mint (can be overridden by env)
@@ -17,8 +16,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ balance: 0 });
         }
 
-        // Use environment variable or default devnet USDC
-        const usdcMint = USDC_MINT || DEFAULT_DEVNET_USDC;
+        // Read env var at runtime (not build time)
+        const usdcMint = process.env.NEXT_PUBLIC_USDC_MINT_ADDRESS || DEFAULT_DEVNET_USDC;
         console.log("[USDC API] Using RPC:", RPC_URL);
         console.log("[USDC API] Using USDC mint:", usdcMint);
         
