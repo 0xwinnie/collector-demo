@@ -17,7 +17,16 @@ export async function POST(request: NextRequest) {
 
         const connection = new Connection(RPC_URL);
         const walletPublicKey = new PublicKey(address);
-        const usdcMintPublicKey = new PublicKey(USDC_MINT);
+        
+        let usdcMintPublicKey: PublicKey;
+        try {
+            usdcMintPublicKey = new PublicKey(USDC_MINT);
+        } catch {
+            return NextResponse.json(
+                { error: "Invalid USDC mint address configuration" },
+                { status: 500 }
+            );
+        }
 
         // Get token accounts for the wallet
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
