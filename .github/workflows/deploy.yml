@@ -1,0 +1,106 @@
+name: Build and Deploy to Vercel
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+    
+    # Auto-fix: Apply SSR safety patches
+    - name: Apply Code Fixes
+      run: |
+        echo "Applying SSR safety fixes..."
+        
+        cat > app/providers.tsx << 'EOF'
+        'use client';
+
+        import React, { useState, useEffect } from 'react';
+        import { PrivyProvider } from '@privy-io/react-auth';
+        import { createSolanaRpc, createSolanaRpcSubscriptions } from '@solana/kit';
+        import { toSolanaWalletConnectors } from '@privy-io/react-auth/solana';
+
+        const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID || '';
+
+        export default function Providers({ children }: { children: React.ReactNode }) {
+            const [mounted, setMounted] = useState(false);
+            useEffect(() => { setMounted(true); }, []);
+
+            if (typeof window === 'undefined' || !mounted || !appId) {
+                return <>{children}</>;
+            }
+
+            return (
+                <PrivyProvider
+                    appId={appId}
+                    config={{
+                        loginMethods: ['google', 'wallet', 'email'],
+                        appearance: {
+                            walletChainType: 'ethereum-and-solana',
+                            theme: 'light',
+                        },
+                        embeddedWallets: {
+                            solana: { createOnLogin: 'users-without-wallets' },
+                            showWalletUIs: false,
+                        },
+                        externalWallets: { 
+                            solana: { 
+                                connectors: toSolanaWalletConnectors({ shouldAutoConnect: false }) 
+                            } 
+                        },
+                        solana: {
+                            rpcs: {
+                                'solana:devnet': {
+                                    rpc: createSolanaRpc('https://api.devnet.solana.com'),
+                                    rpcSubscriptions: createSolanaRpcSubscriptions('wss://api.devnet.solana.com'),
+                                },
+                            },
+                        },
+                    }}
+                >
+                    {children}
+                </PrivyProvider>
+            );
+        }
+        EOF
+        
+        cat > next.config.js << 'EOF'
+        /** @type {import('next').NextConfig} */
+        const nextConfig = {
+          reactStrictMode: false,
+        };
+
+        module.exports = nextConfig;
+        EOF
+        
+        echo "Fixes applied!"
+    
+    - name: Install dependencies
+      run: pnpm install
+    
+    - name: Build project
+      run: pnpm build
+      env:
+        NEXT_PUBLIC_PRIVY_APP_ID: ${{ secrets.NEXT_PUBLIC_PRIVY_APP_ID }}
+    
+    - name: Deploy to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
