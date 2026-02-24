@@ -14,9 +14,29 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         setMounted(true); 
     }, []);
 
-    // Don't render PrivyProvider until client-side mount
-    if (!mounted || !appId) {
-        return <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">{children}</div>;
+    // Show loading state until client-side mount and appId is available
+    if (!mounted) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex items-center justify-center">
+                <div className="text-center text-white">
+                    <div className="text-6xl mb-4">🎴</div>
+                    <p>Loading...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // If no appId, show error
+    if (!appId) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex items-center justify-center">
+                <div className="text-center text-white p-8">
+                    <div className="text-6xl mb-4">⚠️</div>
+                    <h2 className="text-2xl font-bold mb-4">Configuration Error</h2>
+                    <p className="text-gray-400">NEXT_PUBLIC_PRIVY_APP_ID is not set</p>
+                </div>
+            </div>
+        );
     }
 
     return (
