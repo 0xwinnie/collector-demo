@@ -10,8 +10,9 @@ const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID || '';
 export default function Providers({ children }: { children: React.ReactNode }) {
     const [mounted, setMounted] = useState(false);
     
-    useEffect(() => { 
-        setMounted(true); 
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setMounted(true);
     }, []);
 
     // Show loading state until client-side mount and appId is available
