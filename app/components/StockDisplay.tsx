@@ -60,8 +60,8 @@ export default function StockDisplay() {
         );
     }
 
-    // Show sns_25 pack stock (the SNS pack type)
-    const packStock = stock["sns_25"] || Object.values(stock)[0];
+    // Show pokemon_50 pack stock
+    const packStock = stock["pokemon_50"] || Object.values(stock)[0];
 
     if (!packStock) {
         return (
