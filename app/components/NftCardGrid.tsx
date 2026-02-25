@@ -68,12 +68,12 @@ export default function NftCardGrid({ machineType }: NftCardGridProps) {
   const fetchNfts = useCallback(async (pageNum: number, append: boolean = false) => {
     try {
       setLoading(true);
-      const code = getMachineCode(machineType);
+      const slug = getMachineCode(machineType);
       const response = await fetch("/api/getNfts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          code,
+          slug,
           rarity: "all",
           page: pageNum,
           limit: 12,

@@ -7,7 +7,13 @@ export async function POST(request: NextRequest) {
         const body = await request.json().catch(() => ({}));
 
         const url = new URL(`${API_BASE_URL}/getNfts`);
-        for (const [key, value] of Object.entries(body)) {
+        // Map 'slug' to 'code' for API compatibility if needed
+        const params = { ...body };
+        if (params.slug && !params.code) {
+            params.code = params.slug;
+            delete params.slug;
+        }
+        for (const [key, value] of Object.entries(params)) {
             if (value !== undefined && value !== null) {
                 url.searchParams.set(key, String(value));
             }
