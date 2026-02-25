@@ -1,6 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useState } from "react";
+import { MachineType } from "@/app/components/MachineToggle";
 
 const PrivyConnect = dynamic(() => import("@/app/components/PrivyConnect"), {
   ssr: false,
@@ -10,33 +12,26 @@ const GachaMachine = dynamic(() => import("@/app/components/GachaMachine"), {
   ssr: false,
 });
 
+const NftCardGrid = dynamic(() => import("@/app/components/NftCardGrid"), {
+  ssr: false,
+});
+
 export default function Home() {
+  const [selectedMachine, setSelectedMachine] = useState<MachineType>("PKMN_50");
+
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
-      {/* Header */}
+      {/* Header - Simplified */}
       <header className="border-b border-gray-800">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo */}
+            {/* Logo - SNS only */}
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-xl">
                 🎰
               </div>
-              <span className="text-xl font-bold text-white">Collector Gacha</span>
+              <span className="text-xl font-bold text-white">SNS</span>
             </div>
-
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center gap-6">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">
-                Marketplace
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">
-                Leaderboards
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">
-                Yolo
-              </a>
-            </nav>
 
             {/* Connect Button */}
             <PrivyConnect />
@@ -44,9 +39,22 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* Main Content - Two Column Layout */}
       <main className="container mx-auto px-4 py-8">
-        <GachaMachine />
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
+          {/* Left Column - NFT Card Grid */}
+          <div className="min-h-0">
+            <NftCardGrid machineType={selectedMachine} />
+          </div>
+
+          {/* Right Column - Gacha Machine */}
+          <div className="lg:sticky lg:top-4 h-fit">
+            <GachaMachine 
+              selectedMachine={selectedMachine}
+              onSelectMachine={setSelectedMachine}
+            />
+          </div>
+        </div>
       </main>
 
       {/* Footer */}

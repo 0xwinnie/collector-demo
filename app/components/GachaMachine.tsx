@@ -6,7 +6,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useWallets } from "@privy-io/react-auth/solana";
 import MachineToggle, { MachineType } from "./MachineToggle";
 import PackDisplay from "./PackDisplay";
-import HeroCarousel from "./HeroCarousel";
+import RecentWinners from "./RecentWinners";
 
 type OpeningPhase = "" | "Generating Pack..." | "Signing Transaction..." | "Submitting Transaction..." | "Opening..." | "Success!";
 
@@ -19,12 +19,15 @@ interface OpenedCard {
   rarity: string;
 }
 
-export default function GachaMachine() {
+interface GachaMachineProps {
+  selectedMachine: MachineType;
+  onSelectMachine: (machine: MachineType) => void;
+}
+
+export default function GachaMachine({ selectedMachine, onSelectMachine }: GachaMachineProps) {
   const { ready, authenticated } = usePrivy();
   const { wallets } = useWallets();
   const wallet = wallets?.[0];
-
-  const [selectedMachine, setSelectedMachine] = useState<MachineType>("PKMN_50");
   const [isOpening, setIsOpening] = useState(false);
   const [openingPhase, setOpeningPhase] = useState<OpeningPhase>("");
   const [error, setError] = useState<string | null>(null);
@@ -125,15 +128,69 @@ export default function GachaMachine() {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8">
-      {/* Hero Carousel */}
-      <HeroCarousel />
+    <div className="w-full space-y-6">
+      {/* Gacha Machine Visual */}
+      <div className="relative bg-[#1A1A1A] rounded-2xl border border-gray-800 overflow-hidden">
+        {/* Machine Header */}
+        <div className="p-4 border-b border-gray-800 bg-gradient-to-r from-blue-900/20 to-purple-900/20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🎰</span>
+              <span className="font-bold text-white">Gacha Machine</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              Online
+            </div>
+          </div>
+        </div>
+
+        {/* Machine Visual */}
+        <div className="p-6 flex justify-center">
+          <div className="relative w-48 h-48">
+            {/* Machine Glow */}
+            <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-full blur-xl animate-pulse" />
+            
+            {/* Machine Body */}
+            <div className="relative w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl border-4 border-gray-700 flex items-center justify-center shadow-2xl">
+              {/* Screen */}
+              <div className="w-32 h-32 bg-black rounded-2xl border-2 border-gray-600 flex items-center justify-center overflow-hidden">
+                <div className="text-center">
+                  <div className="text-4xl mb-1">
+                    {selectedMachine === "PKMN_50" ? "🎴" : "🔗"}
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    {selectedMachine === "PKMN_50" ? "PKMN $50" : "SNS $25"}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Decorative Lights */}
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 flex gap-2">
+                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse delay-75" />
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse delay-150" />
+              </div>
+            </div>
+
+            {/* Coin Slot */}
+            <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-3 h-8 bg-gray-700 rounded-r-lg border-l border-gray-600" />
+          </div>
+        </div>
+
+        {/* Machine Footer */}
+        <div className="p-4 border-t border-gray-800">
+          <p className="text-center text-sm text-gray-400">
+            Insert coin to play • Instant delivery
+          </p>
+        </div>
+      </div>
 
       {/* Machine Toggle */}
       <div className="flex justify-center">
         <MachineToggle
           selectedMachine={selectedMachine}
-          onSelectMachine={setSelectedMachine}
+          onSelectMachine={onSelectMachine}
         />
       </div>
 
@@ -144,6 +201,9 @@ export default function GachaMachine() {
         isOpening={isOpening}
         openingPhase={openingPhase}
       />
+
+      {/* Recent Winners */}
+      <RecentWinners />
 
       {/* Error Message */}
       {error && (
