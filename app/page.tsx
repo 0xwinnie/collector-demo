@@ -25,12 +25,27 @@ export default function Home() {
       <header className="border-b border-gray-800">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo - SNS only */}
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-xl">
-                🎰
+            {/* Logo - SNS */}
+            <div className="flex items-center gap-3">
+              {/* SNS Green Hexagonal Icon */}
+              <div className="w-10 h-10 relative">
+                <svg viewBox="0 0 40 40" className="w-full h-full">
+                  {/* Outer hexagon */}
+                  <path 
+                    d="M20 2L35.5 11V29L20 38L4.5 29V11L20 2Z" 
+                    fill="#00D084"
+                  />
+                  {/* Inner hexagonal pattern */}
+                  <path 
+                    d="M20 8L29 13.5V24.5L20 30L11 24.5V13.5L20 8Z" 
+                    fill="#00B874"
+                  />
+                  {/* Center element */}
+                  <circle cx="20" cy="19" r="4" fill="#00D084"/>
+                </svg>
               </div>
-              <span className="text-xl font-bold text-white">SNS</span>
+              {/* SNS text */}
+              <span className="text-2xl font-bold text-gray-100 tracking-tight lowercase">sns</span>
             </div>
 
             {/* Connect Button */}
