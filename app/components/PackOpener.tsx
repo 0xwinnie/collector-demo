@@ -79,7 +79,7 @@ export default function PackOpener({ onPackOpened }: PackOpenerProps) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     wallet: wallet.address,
-                    packType: "sns_25",
+                    packType: "pokemon_50",
                 }),
             });
 
@@ -214,7 +214,7 @@ export default function PackOpener({ onPackOpened }: PackOpenerProps) {
                             ) : (
                                 <span className="flex items-center gap-2">
                                     <span className="text-2xl">🎁</span>
-                                    Open $25 Pack
+                                    Open $50 Pack
                                 </span>
                             )}
                         </button>
