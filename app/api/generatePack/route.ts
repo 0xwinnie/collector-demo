@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
         // Transform the request body to match the API requirements
         // Support sns_25 pack type (and other types directly)
-        const packType = body.packType || "sns_25";
+        const packType = body.packType || "pokemon_50";
         const apiRequestBody = {
             playerAddress: body.wallet || body.playerAddress,
             packType: packType,
