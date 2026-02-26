@@ -36,8 +36,9 @@ export async function POST(request: NextRequest) {
             const errorData = await response.json().catch(() => ({}));
             console.log("API error response:", errorData);
 
+            const message = errorData.details || errorData.error || response.statusText;
             return NextResponse.json(
-                { error: `Failed to generate pack: ${response.statusText}`, details: errorData },
+                { error: `Failed to generate pack: ${message}`, details: errorData },
                 { status: response.status }
             );
         }

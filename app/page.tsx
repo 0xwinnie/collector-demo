@@ -63,7 +63,7 @@ export default function Home() {
           </div>
 
           {/* Right Column - Gacha Machine */}
-          <div className="lg:sticky lg:top-4 h-fit">
+          <div className="h-fit">
             <GachaMachine 
               selectedMachine={selectedMachine}
               onSelectMachine={setSelectedMachine}

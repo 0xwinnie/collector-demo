@@ -74,7 +74,6 @@ export default function NftCardGrid({ machineType }: NftCardGridProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           slug,
-          rarity: "all",
           page: pageNum,
           limit: 12,
         }),

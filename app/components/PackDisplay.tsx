@@ -61,6 +61,8 @@ interface PackDisplayProps {
   onOpenPack: (machineType: MachineType, turbo: boolean) => void;
   isOpening: boolean;
   openingPhase?: string;
+  error?: string | null;
+  onDismissError?: () => void;
 }
 
 export default function PackDisplay({
@@ -68,6 +70,8 @@ export default function PackDisplay({
   onOpenPack,
   isOpening,
   openingPhase = "",
+  error,
+  onDismissError,
 }: PackDisplayProps) {
   const { ready, authenticated } = usePrivy();
   const { wallets } = useWallets();
@@ -153,6 +157,20 @@ export default function PackDisplay({
               <span>Sign In to Open</span>
             )}
           </button>
+
+          {/* Error message */}
+          {error && (
+            <div className="flex items-start justify-between gap-3 px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl">
+              <p className="text-red-400 text-sm">{error}</p>
+              {onDismissError && (
+                <button onClick={onDismissError} className="text-red-500 hover:text-red-300 shrink-0 mt-0.5">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Turbo Toggle */}
           <div className="flex items-center justify-between">

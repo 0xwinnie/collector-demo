@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const API_BASE_URL = "https://dev-gacha.collectorcrypt.com/api";
 
 export async function POST(request: NextRequest) {
+    const API_KEY = process.env.API_KEY;
     try {
         const body = await request.json().catch(() => ({}));
 
@@ -17,6 +18,9 @@ export async function POST(request: NextRequest) {
 
         const response = await fetch(url.toString(), {
             method: "GET",
+            headers: {
+                "x-api-key": API_KEY || "",
+            },
             cache: "no-store",
         });
 
