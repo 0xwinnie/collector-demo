@@ -3,11 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 const API_BASE_URL = "https://dev-gacha.collectorcrypt.com/api";
 
 export async function POST(request: NextRequest) {
+    const API_KEY = process.env.API_KEY;
     try {
         const body = await request.json().catch(() => ({}));
 
         const url = new URL(`${API_BASE_URL}/getNfts`);
-        for (const [key, value] of Object.entries(body)) {
+        // Pass params directly - backend expects 'slug' not 'code'
+        const params = { ...body };
+        for (const [key, value] of Object.entries(params)) {
             if (value !== undefined && value !== null) {
                 url.searchParams.set(key, String(value));
             }
@@ -15,6 +18,9 @@ export async function POST(request: NextRequest) {
 
         const response = await fetch(url.toString(), {
             method: "GET",
+            headers: {
+                "x-api-key": API_KEY || "",
+            },
             cache: "no-store",
         });
 

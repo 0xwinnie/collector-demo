@@ -84,7 +84,9 @@ export default function PackOpener({ onPackOpened }: PackOpenerProps) {
             });
 
             if (!generateRes.ok) {
-                throw new Error("Failed to generate pack");
+                const errorData = await generateRes.json().catch(() => ({ error: "Unknown error" }));
+                console.error("Generate pack error:", errorData);
+                throw new Error(errorData.error || errorData.details || `Failed to generate pack: ${generateRes.statusText}`);
             }
 
             const { transaction: buyTransaction, memo } = await generateRes.json();
